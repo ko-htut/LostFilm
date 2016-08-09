@@ -16,15 +16,11 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-/**
- * Created by Alexandr Novak on 22/05/16.
- */
+
 public class HTTPUrl {
 
-
-
-    public static final String SAVED_FILE =Environment.getExternalStorageDirectory()+"/savedFile.xml";
-    public static final String DEBUG_FILE=Environment.getExternalStorageDirectory()+"/debug.txt";
+    //public static final String SAVED_FILE =Environment.getExternalStorageDirectory()+"/savedFile.xml";
+   // public static final String DEBUG_FILE=Environment.getExternalStorageDirectory()+"/debug.txt";
 
 /*
     public File getCodeByUrl(String path) {
@@ -88,7 +84,7 @@ public class HTTPUrl {
         return null;
     }
 
-
+/*
     public File getFileByUrl(String path)
     {
         try
@@ -123,5 +119,5 @@ public class HTTPUrl {
             e.printStackTrace();
         }
         return null;
-    }
+    }*/
 }

@@ -14,18 +14,20 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+
 import android.widget.Toast;
 
 import com.alexandr.lostfilm.database.DB;
-import com.example.alexandr.lostfilm.R;
 import com.alexandr.lostfilm.database.task.DbTaskAddAllSerials;
-import com.alexandr.lostfilm.inet.parse.WebParser;
+import com.example.alexandr.lostfilm.R;
+import com.alexandr.lostfilm.inet.WebParser;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,9 +57,15 @@ public class MainActivity extends AppCompatActivity {
         Cursor c = db.getAllSerials();
         if (c.getCount()==0)
         {
+            Log.i("debugCursorDB","database is empty");
             DbTaskAddAllSerials dbTask = new DbTaskAddAllSerials();
             dbTask.execute(getApplicationContext());
         }
+        else
+        {
+            Log.i("debugCursorDB","database is not empty");
+        }
+        c.close();
         db.close();
 
         fab_fade_in=AnimationUtils.loadAnimation(getApplicationContext(),android.R.anim.fade_in);

@@ -5,17 +5,21 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.util.Log;
 
-/**
- * Created by alexandr on 04/08/16.
- */
+
 public class DB {
+
 
     private static final String DB_NAME = "LostFilmDB";
     private static final int DB_VERSION = 1;
     private static final String DB_TABLE_ALL = "SerialAll";
     private static final String DB_TABLE_FAV = "SerialFavorite";
 
+
+    public static final Uri URI_TABLE_ALL = Uri.parse("sqlite://com.alexandr.lostfilm/table/" + DB_TABLE_ALL);
+    public static final Uri URI_TABLE_FAV = Uri.parse("sqlite://com.loader.demo/table/" + DB_TABLE_FAV);
 
     public static final String ALL_COLUMN_ID = "_id";
     public static final String ALL_COLUMN_LINK = "link";

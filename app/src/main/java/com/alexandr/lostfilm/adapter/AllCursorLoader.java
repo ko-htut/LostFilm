@@ -16,7 +16,11 @@ public class AllCursorLoader extends CursorLoader {
         return cursor;
     }
 
+    @Override
+    public void deliverResult(Cursor cursor) {
 
+        super.deliverResult(cursor);
+    }
 
     public AllCursorLoader(Context context, DB db) {
         super(context);

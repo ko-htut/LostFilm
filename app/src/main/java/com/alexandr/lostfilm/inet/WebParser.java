@@ -1,9 +1,11 @@
-package com.alexandr.lostfilm.inet.parse;
+package com.alexandr.lostfilm.inet;
 
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
 import com.alexandr.lostfilm.database.AllSerials;
+import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.database.FavSerials;
 import com.alexandr.lostfilm.inet.HTTPUrl;
 
@@ -20,13 +22,15 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by alexandr on 22/05/16.
- */
 public class WebParser {
     public static final String NEW = "http://www.lostfilm.tv/browse.php";
     public static final String ALL = "http://www.lostfilm.tv/serials.php";
     public static final String baseURL = "http://lostfilm.tv";
+    private Context mCtx;
+
+    public WebParser(){}
+
+    public WebParser(Context ctx){ this.mCtx=ctx;}
 
     public void parseNewSeries() {
         HTTPUrl download = new HTTPUrl();
@@ -55,10 +59,10 @@ public class WebParser {
             $dates = $matches[5]; // Даты
              */
            // String out = matcher.group(1)+" "+matcher.group(2)+" "+matcher.group(3)+" "+matcher.group(4)+" "+matcher.group(5);
-           // Log.i("shit",out);
+
 
         } else {
-            Log.i("PHP fuck", "it is null");
+            Log.i("PHP", "it is null");
         }
         //return result;
     }
@@ -78,27 +82,31 @@ public class WebParser {
             Pattern pattern = Pattern.compile
                     ("(?imsd)<a href=\"([^\"]+).*?\" class=\"bb_a\">(.*?)<br><span>(.*?)</span>");
             Matcher matcher = pattern.matcher(source);
+            DB db = new DB(mCtx);
+            db.open();
 
             while (matcher.find())
             {
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
+                db.addToAll(link,ru,en);
+                Log.i("debug",ru);
                 result.add(new AllSerials(link,ru,en));
-                try
+                /*try
                 {
                     Log.i("debugDetail",ru);
                     parseAllDetail(new URL(baseURL+link));
                 }
                 catch (MalformedURLException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
 
 
 
         } else {
-            Log.i("PHP fuck", "it is null");
+            Log.i("PHP", "it is null");
         }
         return result;
     }
@@ -108,9 +116,9 @@ public class WebParser {
     private void writeToFile (String s)
     {
         try {
-            Log.i("ebat",s);
+            Log.i("debugFile",s);
             System.out.println(s);
-            FileWriter fw = new FileWriter(new File(Environment.getExternalStorageDirectory()+"/ebat.txt"));
+            FileWriter fw = new FileWriter(new File(Environment.getExternalStorageDirectory()+"/debugFile.txt"));
             fw.write(s);
             fw.flush();
             fw.close();

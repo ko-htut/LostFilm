@@ -13,9 +13,7 @@ import com.example.alexandr.lostfilm.R;
 
 import java.util.ArrayList;
 
-/**
- * Created by alexandr on 22/05/16.
- */
+
 public class FragmentFavorite extends Fragment {
 
     ArrayList<SerialFavorite> serials = new ArrayList<>();
