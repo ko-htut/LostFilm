@@ -27,10 +27,16 @@ public class WebParser {
     public static final String ALL = "http://www.lostfilm.tv/serials.php";
     public static final String baseURL = "http://lostfilm.tv";
     private Context mCtx;
+    private DB mDB;
+
 
     public WebParser(){}
 
-    public WebParser(Context ctx){ this.mCtx=ctx;}
+    public WebParser(Context ctx)
+    {
+        this.mCtx=ctx;
+        mDB= new DB(ctx);
+    }
 
     public void parseNewSeries() {
         HTTPUrl download = new HTTPUrl();
@@ -77,7 +83,7 @@ public class WebParser {
             String source = parseString.toString();
             source = source.substring(source.indexOf("<!-- ### Полный список сериалов -->"),source.length());
             source = source.substring(0,source.indexOf("<br />"));
-            writeToFile(source);
+
 
             Pattern pattern = Pattern.compile
                     ("(?imsd)<a href=\"([^\"]+).*?\" class=\"bb_a\">(.*?)<br><span>(.*?)</span>");
@@ -92,17 +98,16 @@ public class WebParser {
                 String en = matcher.group(3);
                 db.addToAll(link,ru,en);
                 Log.i("debug",ru);
-                result.add(new AllSerials(link,ru,en));
-                /*try
+                //result.add(new AllSerials(link,ru,en));
+                try
                 {
-                    Log.i("debugDetail",ru);
-                    parseAllDetail(new URL(baseURL+link));
+                    parseAllDetail(new URL(baseURL+link),ru,en);
                 }
                 catch (MalformedURLException e) {
                     e.printStackTrace();
-                }*/
+                }
             }
-
+            mDB.close();
 
 
         } else {
@@ -111,23 +116,7 @@ public class WebParser {
         return result;
     }
 
-
-
-    private void writeToFile (String s)
-    {
-        try {
-            Log.i("debugFile",s);
-            System.out.println(s);
-            FileWriter fw = new FileWriter(new File(Environment.getExternalStorageDirectory()+"/debugFile.txt"));
-            fw.write(s);
-            fw.flush();
-            fw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void parseAllDetail(URL link)
+    private void parseAllDetail(URL link,String ru, String eng)
     {
         try
         {
@@ -151,6 +140,7 @@ public class WebParser {
             Log.i("debugDetail"," date: "+info[0]);
             Log.i("debugDetail"," episode: "+info[1]);
             Log.i("debugDetail"," ");
+            mDB.addToAll(link.toString(),ru,eng,status,pic_link,bigPicToSmall(pic_link),info[0],info[1],0);
 
         }
         catch (IOException e) {
@@ -158,8 +148,12 @@ public class WebParser {
         }
     }
 
-
-
+    private String bigPicToSmall (String link)
+    {
+        link=link.replace("posters","icons");
+        link=link.replace("poster","cat");
+        return link;
+    }
 
 /*
     public void convert(File f) {

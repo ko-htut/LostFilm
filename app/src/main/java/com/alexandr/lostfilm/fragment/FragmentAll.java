@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
@@ -20,11 +21,12 @@ import android.widget.Toast;
 import com.alexandr.lostfilm.adapter.CursorObserver;
 import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.adapter.AllCursorLoader;
+import com.alexandr.lostfilm.database.task.DbTaskAddAllSerials;
 import com.example.alexandr.lostfilm.R;
 
 public class FragmentAll extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> , SwipeRefreshLayout.OnRefreshListener{
 
-
+    public static int LOADER_ID=0;
     SimpleCursorAdapter scAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -36,6 +38,7 @@ public class FragmentAll extends Fragment  implements LoaderManager.LoaderCallba
     public static FragmentAll newInstance()
     {
         FragmentAll f = new FragmentAll();
+
         return f;
     }
     @Override
@@ -52,26 +55,11 @@ public class FragmentAll extends Fragment  implements LoaderManager.LoaderCallba
         int[] to = new int[] { R.id.allTVname };
 
         scAdapter = new SimpleCursorAdapter(getContext(), R.layout.item_all, null, from, to, 0);
-//костыль
-        DB db = new DB(getContext());
-        db.open();
-        Cursor c = db.getAllSerials();
-        if (c.getCount()==0) {
-            Toast.makeText(getContext(),"please wait",Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-
-        }
-        db.close();
-        c.close();
-//конец костыля
-
 
         ListView lvAll = (ListView) rootView.findViewById(R.id.lvAll);
         lvAll.setAdapter(scAdapter);
 
-       getActivity().getSupportLoaderManager().initLoader(0, null, this);
+       getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         return rootView;
     }
 
@@ -93,6 +81,7 @@ public class FragmentAll extends Fragment  implements LoaderManager.LoaderCallba
         CursorObserver cursorObserver = new CursorObserver(new Handler(), loader);
         data.registerContentObserver(cursorObserver);
         data.setNotificationUri(getContext().getContentResolver(), DB.URI_TABLE_ALL);
+        swipeRefreshLayout.setRefreshing(false);
         //scAdapter.notifyDataSetChanged();
     }
 
@@ -104,17 +93,25 @@ public class FragmentAll extends Fragment  implements LoaderManager.LoaderCallba
 
     @Override
     public void onRefresh() {
-        Log.i("debugOnRefresh","onRefresh");
         swipeRefreshLayout.setRefreshing(true);
-        Loader loader =getActivity().getSupportLoaderManager().getLoader(0);
+        Log.i("debugOnRefresh","onRefresh");
+        DbTaskAddAllSerials dbTaskAddAllSerials = new DbTaskAddAllSerials();
+        dbTaskAddAllSerials.execute(this);
+
+    }
+
+    public void refreshListView()
+    {
+        Loader loader =getActivity().getSupportLoaderManager().getLoader(LOADER_ID);
         if (loader==null)
         {
-            getActivity().getSupportLoaderManager().initLoader(0, null, this);
+            getActivity().getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         }
         else
         {
             loader.forceLoad();
         }
         swipeRefreshLayout.setRefreshing(false);
+
     }
 }

@@ -31,7 +31,7 @@ public class CursorObserver extends ContentObserver {
         Log.e(TAG, ":::: onChange");
 
         if (null != loader) {
-            loader.onContentChanged();
+            loader.forceLoad();
         }
         super.onChange(selfChange);
     }

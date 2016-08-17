@@ -1,48 +1,59 @@
-package com.alexandr.lostfilm.database.task;
+package com.alexandr.lostfilm.init;
 
-
+import android.app.ProgressDialog;
 import android.content.Context;
-
 import android.os.AsyncTask;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.content.Loader;
 import android.util.Log;
 
+import com.alexandr.lostfilm.MainActivity;
 import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.fragment.FragmentAll;
 import com.alexandr.lostfilm.inet.HTTPUrl;
 import com.alexandr.lostfilm.inet.WebParser;
-import com.example.alexandr.lostfilm.R;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DbTaskAddAllSerials extends AsyncTask<FragmentAll, Boolean, Void> {
-    FragmentAll fm;
-    private Context mCtx;
-    private SwipeRefreshLayout swipeRefreshLayout;
+/**
+ * AsyncTask will load all serials on first run
+ */
+public class AllSerialInitTask extends AsyncTask<MainActivity, Void, Void> {
+
+    Context mCtx;
+    MainActivity mActivity;
+
     @Override
-    protected void onProgressUpdate(Boolean... values) {
-        super.onProgressUpdate(values);
-       // swipeRefreshLayout= (SwipeRefreshLayout) fm.getView().findViewById(R.id.swipe_refresh_layout_all);
-       // swipeRefreshLayout.setRefreshing(values[0]);
+    protected void onPreExecute() {
+        super.onPreExecute();
 
     }
 
     @Override
-    protected Void doInBackground(FragmentAll... params) {
-        fm=params[0];
-        mCtx=fm.getContext();
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        mActivity.dialog.dismiss();
+
+        Loader loader =mActivity.getSupportLoaderManager().getLoader(FragmentAll.LOADER_ID);
+        if (loader==null)
+        {
+            mActivity.getSupportLoaderManager().initLoader(FragmentAll.LOADER_ID, null, null);
+        }
+        else
+        {
+            loader.forceLoad();
+        }
+        mActivity.mViewPager.setCurrentItem(0);
+        mActivity.mViewPager.setCurrentItem(1);
+    }
+
+    @Override
+    protected Void doInBackground(MainActivity... params) {
+        mCtx=params[0].getApplicationContext();
+        mActivity=params[0];
         DB db = new DB(mCtx);
         db.open();
-/*
-        WebParser wb = new WebParser(mCtx);
-        ArrayList<AllSerials> listAllSerials =wb.parseAllSerials();
 
-        for (int i=0; i<listAllSerials.size();i++)
-        {
-            AllSerials serial = listAllSerials.get(i);
-           // db.addToAll(serial.getLink(),serial.getRuName(),serial.getEngName());
-        }
-        db.close();*/
         HTTPUrl download = new HTTPUrl();
 
         String parseString = download.getCodeByUrlToString(WebParser.ALL);
@@ -57,23 +68,17 @@ public class DbTaskAddAllSerials extends AsyncTask<FragmentAll, Boolean, Void> {
 
             while (matcher.find())
             {
-                publishProgress(true);
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
                 db.addToAll(link,ru,en);
                 //Log.i("debug",ru);
             }
-            Log.i("debug","all seriae parsed");
+            Log.i("debug","all serial parsed");
         } else {
             Log.i("PHP", "it is null");
         }
+        db.close();
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void aVoid) {
-        super.onPostExecute(aVoid);
-        fm.refreshListView();
     }
 }
