@@ -36,6 +36,7 @@ public class WebParser {
     {
         this.mCtx=ctx;
         mDB= new DB(ctx);
+        mDB.open();
     }
 
     public void parseNewSeries() {
@@ -88,15 +89,15 @@ public class WebParser {
             Pattern pattern = Pattern.compile
                     ("(?imsd)<a href=\"([^\"]+).*?\" class=\"bb_a\">(.*?)<br><span>(.*?)</span>");
             Matcher matcher = pattern.matcher(source);
-            DB db = new DB(mCtx);
-            db.open();
+            //DB db = new DB(mCtx);
+           // db.open();
 
             while (matcher.find())
             {
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
-                db.addToAll(link,ru,en);
+              //  db.addToAll(link,ru,en);
                 Log.i("debug",ru);
                 //result.add(new AllSerials(link,ru,en));
                 try
@@ -108,7 +109,7 @@ public class WebParser {
                 }
             }
             mDB.close();
-
+            Log.i("debug"," all serials parsed");
 
         } else {
             Log.i("PHP", "it is null");
@@ -125,22 +126,22 @@ public class WebParser {
 
             Element pic = element.select("img").first();
             String pic_link = pic.attr("src");
-            Log.i("debugDetail",pic_link);
+            //Log.i("debugDetail",pic_link);
 
             Pattern pattern = Pattern.compile
                     ("(?imsd)Статус: (.*?)Сайт");
             Matcher matcher = pattern.matcher(element.text());
             matcher.find();
             String status = matcher.group(1);
-            Log.i("debugDetail"," status: "+status);
+           // Log.i("debugDetail"," status: "+status);
 
             Element lastEpisode = element.select("span.micro").first();
             //Log.i("debugDetail"," micro: "+lastEpisode.text());
             String[] info = lastEpisode.text().split(",");
-            Log.i("debugDetail"," date: "+info[0]);
-            Log.i("debugDetail"," episode: "+info[1]);
-            Log.i("debugDetail"," ");
-            mDB.addToAll(link.toString(),ru,eng,status,pic_link,bigPicToSmall(pic_link),info[0],info[1],0);
+            //Log.i("debugDetail"," date: "+info[0]);
+            //Log.i("debugDetail"," episode: "+info[1]);
+            //Log.i("debugDetail"," ");
+            mDB.addToAll(link.toString(),ru,eng,status.trim(),pic_link,bigPicToSmall(pic_link),info[0],info[1],0);
 
         }
         catch (IOException e) {

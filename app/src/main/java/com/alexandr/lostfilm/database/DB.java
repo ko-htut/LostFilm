@@ -54,7 +54,7 @@ public class DB {
                     ALL_COLUMN_SMALL_PICTURE + " text, " +
                     ALL_COLUMN_DATE + " text, " +
                     ALL_COLUMN_LAST_EPISODE + " text," +
-                    ALL_COLUMN_IS_FAVORITE + "integer " +
+                    ALL_COLUMN_IS_FAVORITE + " integer " +
                     ");";
 
     private static final String DB_CREATE_FAV =

@@ -51,7 +51,10 @@ public class AllSerialInitTask extends AsyncTask<MainActivity, Void, Void> {
     protected Void doInBackground(MainActivity... params) {
         mCtx=params[0].getApplicationContext();
         mActivity=params[0];
-        DB db = new DB(mCtx);
+        WebParser wb = new WebParser(mCtx);
+        wb.parseAllSerials();
+
+        /*DB db = new DB(mCtx);
         db.open();
 
         HTTPUrl download = new HTTPUrl();
@@ -78,7 +81,7 @@ public class AllSerialInitTask extends AsyncTask<MainActivity, Void, Void> {
         } else {
             Log.i("PHP", "it is null");
         }
-        db.close();
+        db.close();*/
         return null;
     }
 }
