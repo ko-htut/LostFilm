@@ -1,27 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="1">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:weightSum="1"
+    android:id="@+id/relativelayout">
     <ImageView
-        android:id="@+id/imgAll"
+        android:id="@+id/allImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher">
     </ImageView>
 
-        <TextView android:layout_height="wrap_content"
+
+    <TextView android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:id="@+id/allTVname"
-            android:paddingTop="16dp"
+            android:id="@+id/allTVnameRu"
             android:paddingLeft="10dp"
-            android:text="Викинги (Vikings)"
+            android:paddingTop="10dp"
+            android:layout_toRightOf="@id/allImg"
+            android:text="Викинги"
             android:textSize="20sp"
             android:layout_weight="1" />
-        <CheckBox
-            android:id="@+id/CheckBoxToAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
 
-</LinearLayout>
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/allTVnameEng"
+        android:paddingLeft="10dp"
+        android:text="(Vikings)"
+        android:textSize="20sp"
+        android:layout_weight="1"
+        android:layout_below="@+id/allTVnameRu"
+        android:layout_toRightOf="@+id/allImg"
+        android:layout_toEndOf="@+id/allImg" />
+
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/allDate"
+        android:paddingTop="10dp"
+        android:text="24.02.1993 23:15"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/allEpisode"
+        android:text="01.01"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/allDate"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>

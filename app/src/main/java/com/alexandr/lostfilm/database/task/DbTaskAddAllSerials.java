@@ -74,6 +74,6 @@ public class DbTaskAddAllSerials extends AsyncTask<FragmentAll, Boolean, Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        fm.refreshListView();
+        //fm.refreshListView();
     }
 }

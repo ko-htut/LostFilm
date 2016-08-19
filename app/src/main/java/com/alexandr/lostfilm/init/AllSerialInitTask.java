@@ -34,17 +34,12 @@ public class AllSerialInitTask extends AsyncTask<MainActivity, Void, Void> {
         super.onPostExecute(aVoid);
         mActivity.dialog.dismiss();
 
-        Loader loader =mActivity.getSupportLoaderManager().getLoader(FragmentAll.LOADER_ID);
-        if (loader==null)
-        {
-            mActivity.getSupportLoaderManager().initLoader(FragmentAll.LOADER_ID, null, null);
-        }
-        else
-        {
-            loader.forceLoad();
-        }
+
         mActivity.mViewPager.setCurrentItem(0);
         mActivity.mViewPager.setCurrentItem(1);
+        if(mActivity.mViewPager.getCurrentItem() == 1) {
+            FragmentAll frag = (FragmentAll) mActivity.mViewPager.getAdapter().instantiateItem(mActivity.mViewPager, mActivity.mViewPager.getCurrentItem());
+            frag.refreshRecyclerView();}
     }
 
     @Override

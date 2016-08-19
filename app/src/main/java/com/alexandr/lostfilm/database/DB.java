@@ -14,13 +14,10 @@ public class DB {
 
     private static final String DB_NAME = "LostFilmDB";
     private static final int DB_VERSION = 1;
-    private static final String DB_TABLE_ALL = "SerialAll";
+
     private static final String DB_TABLE_SERIALS = "Serials";
-    private static final String DB_TABLE_FAV = "SerialFavorite";
 
 
-    public static final Uri URI_TABLE_ALL = Uri.parse("sqlite://com.alexandr.lostfilm/table/" + DB_TABLE_ALL);
-    public static final Uri URI_TABLE_FAV = Uri.parse("sqlite://com.loader.demo/table/" + DB_TABLE_FAV);
 
     public static final String ALL_COLUMN_ID = "_id";
     public static final String ALL_COLUMN_LINK = "link";
@@ -32,15 +29,10 @@ public class DB {
     public static final String ALL_COLUMN_DATE = "date";
     public static final String ALL_COLUMN_LAST_EPISODE = "episode";
     public static final String ALL_COLUMN_IS_FAVORITE = "isFavorite";
+    public static final String ALL_COLUMN_DETAIL_RU = "descr_ru";
+    public static final String ALL_COLUMN_DETAIL_ENG = "descr_eng";
 
 
-
-    public static final String FAV_COLUMN_ID = "_id";
-    public static final String FAV_COLUMN_S_EP = "s_ep";
-    public static final String FAV_COLUMN_RU_NAME = "ruName";
-    public static final String FAV_COLUMN_PIC_LINK = "pic_link";
-    public static final String FAV_COLUMN_DESCRIPTION = "descr";
-    public static final String FAV_COLUMN_DATE = "date";
 
 
     private static final String DB_CREATE_SERIALS=
@@ -54,26 +46,12 @@ public class DB {
                     ALL_COLUMN_SMALL_PICTURE + " text, " +
                     ALL_COLUMN_DATE + " text, " +
                     ALL_COLUMN_LAST_EPISODE + " text," +
+                    ALL_COLUMN_DETAIL_ENG + " text," +
+                    ALL_COLUMN_DETAIL_RU + " text," +
                     ALL_COLUMN_IS_FAVORITE + " integer " +
                     ");";
 
-    private static final String DB_CREATE_FAV =
-            "create table " + DB_TABLE_FAV + "(" +
-                    FAV_COLUMN_ID + " integer primary key autoincrement, " +
-                    FAV_COLUMN_RU_NAME + " text UNIQUE ON CONFLICT IGNORE, " +
-                    FAV_COLUMN_S_EP + " text," +
-                    FAV_COLUMN_DESCRIPTION + " text," +
-                    FAV_COLUMN_PIC_LINK + " text," +
-                    FAV_COLUMN_DATE + " text" +
-                    ");";
 
-    private static final String DB_CREATE_ALL =
-            "create table " + DB_TABLE_ALL + "(" +
-                    ALL_COLUMN_ID + " integer primary key autoincrement, " +
-                    ALL_COLUMN_LINK + " text, " +
-                    ALL_COLUMN_RU_NAME + " text UNIQUE ON CONFLICT IGNORE," +
-                    ALL_COLUMN_ENG_NAME + " text " +
-                    ");";
 
     private final Context mCtx;
 
@@ -87,6 +65,8 @@ public class DB {
 
     // открыть подключение
     public void open() {
+
+        Log.i("DBDEBUG",mCtx.toString());
         mDBHelper = new DBHelper(mCtx, DB_NAME, null, DB_VERSION);
         mDB = mDBHelper.getWritableDatabase();
     }
@@ -100,12 +80,12 @@ public class DB {
     // получить все данные из таблицы DB_TABLE
     public Cursor getAllSerials() {
         System.out.println(mDB.toString());
-        return mDB.query(DB_TABLE_SERIALS, null, null, null, null, null, null);
+        return mDB.query(DB_TABLE_SERIALS, null, "isFavorite=0", null, null, null, null);
     }
 
     public Cursor getFavSerials() {
         System.out.println(mDB.toString());
-        return mDB.query(DB_TABLE_SERIALS, null, null, null, null, null, null);
+        return mDB.query(DB_TABLE_SERIALS, null, "isFavorite!=0", null, null, null, null);
     }
 
     // добавить запись в DB_TABLE SERIALS
@@ -114,7 +94,7 @@ public class DB {
         cv.put(ALL_COLUMN_LINK, link);
         cv.put(ALL_COLUMN_RU_NAME, ruName);
         cv.put(ALL_COLUMN_ENG_NAME, engName);
-        mDB.insert(DB_TABLE_ALL, null, cv);
+        mDB.insert(DB_TABLE_SERIALS, null, cv);
     }
 
     public void addToFav(String ruName)
@@ -143,7 +123,7 @@ public class DB {
     // добавить запись в DB_TABLE SERIALS
     public void addToAll(String link, String ruName , String engName, String status,
                          String bigPicture, String smallPicture, String date,
-                         String lastEpisode, int isFavorite)
+                         String lastEpisode,String descr_ru, String descr_eng, int isFavorite)
     {
         ContentValues cv = new ContentValues();
         cv.put(ALL_COLUMN_LINK, link);
@@ -154,6 +134,8 @@ public class DB {
         cv.put(ALL_COLUMN_SMALL_PICTURE,smallPicture);
         cv.put(ALL_COLUMN_DATE,date);
         cv.put(ALL_COLUMN_LAST_EPISODE,lastEpisode);
+        cv.put(ALL_COLUMN_DETAIL_ENG,descr_eng);
+        cv.put(ALL_COLUMN_DETAIL_RU, descr_ru);
         cv.put(ALL_COLUMN_IS_FAVORITE,isFavorite);
         mDB.insert(DB_TABLE_SERIALS, null, cv);
     }

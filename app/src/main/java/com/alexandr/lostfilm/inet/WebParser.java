@@ -98,7 +98,7 @@ public class WebParser {
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
               //  db.addToAll(link,ru,en);
-                Log.i("debug",ru);
+              //  Log.i("debug",ru);
                 //result.add(new AllSerials(link,ru,en));
                 try
                 {
@@ -124,25 +124,47 @@ public class WebParser {
             Document doc = Jsoup.parse(link,1000);
             Element element = doc.select("div.mid").first();
 
-            Element pic = element.select("img").first();
-            String pic_link = pic.attr("src");
-            //Log.i("debugDetail",pic_link);
-
             Pattern pattern = Pattern.compile
                     ("(?imsd)Статус: (.*?)Сайт");
             Matcher matcher = pattern.matcher(element.text());
             matcher.find();
-            String status = matcher.group(1);
-           // Log.i("debugDetail"," status: "+status);
+            String status = matcher.group(1).trim();
+            if (!status.equals("закончен")) {
+                //Log.i("debugStatus",status);
+                Element pic = element.select("img").first();
+                String pic_link = pic.attr("src");
+                //Log.i("debugDetail",pic_link);
 
-            Element lastEpisode = element.select("span.micro").first();
-            //Log.i("debugDetail"," micro: "+lastEpisode.text());
-            String[] info = lastEpisode.text().split(",");
-            //Log.i("debugDetail"," date: "+info[0]);
-            //Log.i("debugDetail"," episode: "+info[1]);
-            //Log.i("debugDetail"," ");
-            mDB.addToAll(link.toString(),ru,eng,status.trim(),pic_link,bigPicToSmall(pic_link),info[0],info[1],0);
+                // Log.i("debugDetail"," status: "+status);
+                Element lastEpisode = element.select("span.micro").first();
+                //Log.i("debugDetail"," micro: "+lastEpisode.text());
+                String[] info = lastEpisode.text().split(",");
+                //Log.i("debugDetail"," date: "+info[0]);
+                //Log.i("debugDetail"," episode: "+info[1]);
+                //Log.i("debugDetail"," ");
+                Element lastEpisodeName = element.select("td.t_episode_title").first();
+                //Log.i("debugDetailTest",lastEpisodeName.text());
+                String descr_ru;
+                String descr_eng;
+                if (lastEpisodeName.text().contains("(")) {
+                    descr_ru = lastEpisodeName.text().substring(0, lastEpisodeName.text().indexOf("(")).trim();
+                    descr_eng = lastEpisodeName.text().substring(lastEpisodeName.text().indexOf("("),
+                            lastEpisodeName.text().length());
 
+                } else {
+                    descr_ru = lastEpisodeName.text().trim();
+                    descr_eng = "";
+                }
+                descr_eng = descr_eng.replace("(", "");
+                descr_eng = descr_eng.replace(")", "").trim();
+
+                //Log.i("debugDetail", descr_ru);
+               // Log.i("debugDetail", descr_eng);
+
+                mDB.addToAll(link.toString(), ru, eng, status.trim(), pic_link,
+                        bigPicToSmall(pic_link), info[0], info[1], descr_ru, descr_eng, 0);
+
+            }
         }
         catch (IOException e) {
             e.printStackTrace();

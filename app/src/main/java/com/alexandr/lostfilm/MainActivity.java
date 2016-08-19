@@ -22,14 +22,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-
-import android.widget.Toast;
-
-import com.alexandr.lostfilm.database.DB;
-import com.alexandr.lostfilm.database.task.DbTaskAddAllSerials;
 import com.alexandr.lostfilm.init.AllSerialInitTask;
 import com.example.alexandr.lostfilm.R;
 import com.alexandr.lostfilm.inet.WebParser;
@@ -39,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     public FloatingActionButton fab;
     private Animation fab_fade_in;
+
+
 
     private String Settings="Settings";
     SharedPreferences sPrefSettings ;
@@ -55,25 +51,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
 
-       /* DB db = new DB(getApplicationContext());
-        db.open();
-        Cursor c = db.getAllSerials();
-        if (c.getCount()==0)
-        {
-            mViewPager.setCurrentItem(0);
-            mViewPager.setCurrentItem(1);
-
-
-           // swipe.setRefreshing(true);
-            // DbTaskAddAllSerials dbTask = new DbTaskAddAllSerials();
-            //  dbTask.execute(getApplicationContext());
-        }
-        else
-        {
-            Log.i("debugCursorDB","database is not empty");
-        }
-        c.close();
-        db.close();*/
 
         sPrefSettings= getSharedPreferences(Settings,0);
         if (sPrefSettings.getBoolean(FIRST_RUN,true))
@@ -82,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
             mViewPager.setCurrentItem(0);
             mViewPager.setCurrentItem(1);
             dialog = new ProgressDialog(MainActivity.this);
+            dialog.setCancelable(false);
+            dialog.setCanceledOnTouchOutside(false);
             dialog.setMessage("message");
             dialog.setTitle("title");
             dialog.show();
@@ -101,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // DbTaskAddAllSerials dbTask = new DbTaskAddAllSerials();
-       // dbTask.execute(getApplicationContext());
-
 
         fab_fade_in=AnimationUtils.loadAnimation(getApplicationContext(),android.R.anim.fade_in);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -115,11 +91,10 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the two
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
+
         mViewPager = (ViewPager) findViewById(R.id.container);
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);

@@ -15,7 +15,8 @@ import com.alexandr.lostfilm.fragment.FragmentFavorite;
             PageFragment pageFragment = new PageFragment();
             switch (page) {
                 case 0:
-                    return new FragmentFavorite();
+                    //return new FragmentFavorite();
+                    return FragmentFavorite.newInstance();
                 case 1:
                     //return new FragmentAll();
                     return FragmentAll.newInstance();

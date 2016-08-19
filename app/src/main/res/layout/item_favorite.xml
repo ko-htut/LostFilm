@@ -1,28 +1,55 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:weightSum="1"
+    android:id="@+id/relativelayout">
     <ImageView
-        android:id="@+id/imgFav"
+        android:id="@+id/favImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_launcher">
     </ImageView>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/favLinearLayout">
-        <TextView android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:id="@+id/favTVname"
-            android:paddingLeft="10dp"
-            android:text="Викинги (Vikings) S05E06"
-            android:textSize="20sp"/>
-        <TextView android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/favTVdate"
-            android:gravity="bottom"
-            android:text="Last Update: 20.02.2015 12:00"
-            />
-    </LinearLayout>
-</LinearLayout>
+
+
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favTVnameRu"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:layout_toRightOf="@id/favImg"
+        android:text="Викинги"
+        android:textSize="20sp"
+        android:layout_weight="1" />
+
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favTVDetailRu"
+        android:paddingLeft="10dp"
+        android:text="(Vikings)"
+        android:textSize="20sp"
+        android:layout_weight="1"
+        android:layout_below="@+id/favTVnameRu"
+        android:layout_toRightOf="@+id/favImg"
+        android:layout_toEndOf="@+id/favImg" />
+
+    <TextView android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/favDate"
+        android:paddingTop="10dp"
+        android:text="24.02.1993 23:15"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/favEpisode"
+        android:text="01.01"
+        android:paddingTop="10dp"
+        android:layout_below="@+id/favDate"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+</RelativeLayout>
