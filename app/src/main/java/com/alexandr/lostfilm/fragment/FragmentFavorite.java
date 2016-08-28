@@ -30,26 +30,38 @@ import java.util.ArrayList;
 public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.OnRefreshListener {
 
     ArrayList<FavSerials> serialList = new ArrayList<>();
-    private RecyclerView recyclerView;
+    RecyclerView recyclerView;
     private FavSerialsAdapter mAdapter;
     DB mDB;
     private SwipeRefreshLayout swipeRefreshLayout;
-    public static FragmentFavorite FRAGMENT_FAV;
+    //public static FragmentFavorite FRAGMENT_FAV;
+    public static String FRAGMENT_TAG;
+    OnAllListChanged mCallback;
+
     public FragmentFavorite()
     {
 
     }
 
-    public static FragmentFavorite newInstance()
-    {
-        //FragmentFavorite f = new FragmentFavorite();
-
-        FRAGMENT_FAV=new FragmentFavorite();
-        // return f;
-        return FRAGMENT_FAV;
-        //return f;
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mCallback = (OnAllListChanged) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
     }
 
+    public static FragmentFavorite newInstance()
+    {
+        return new FragmentFavorite();
+    }
+
+    public interface OnAllListChanged {
+        void onAllListChange();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,6 +69,9 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragment_favorite, container, false);
 
+
+        FRAGMENT_TAG=this.getTag();
+        Log.i("debugFragment","inside Fav tag="+FRAGMENT_TAG);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_fav);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -75,14 +90,12 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                FavSerials movie = serialList.get(position);
-                //Toast.makeText(getContext(), "click: "+movie.getRuName(), Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                FavSerials movie = serialList.get(position);
-                //Toast.makeText(getContext(),"long click: "+movie.getRuName(),Toast.LENGTH_SHORT).show();
+
             }
         }));
 
@@ -102,12 +115,15 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             //Remove swiped item from list and notify the RecyclerView
-            mDB.open();
+            Log.i("debug_db","called from FragmentFav, swipe");
+            mDB= new DB(getContext());
+            mDB.openWritable();
             mDB.delFromFav(serialList.get(viewHolder.getAdapterPosition()).getName());
             mDB.close();
             serialList.remove(viewHolder.getAdapterPosition());
+            mCallback.onAllListChange();
             mAdapter.notifyDataSetChanged();
-            FragmentAll.FRAGMENT_ALL.refreshRecyclerView();
+            //FragmentAll.FRAGMENT_ALL.refreshRecyclerView();
 
         }
     };
@@ -170,8 +186,9 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
 
     public void refreshRecyclerView()
     {
+        Log.i("debug_db","called from FragmentFav, refresh");
         mDB = new DB(getContext());
-        mDB.open();
+        mDB.openReadOnly();
 
         Cursor serials = mDB.getFavSerials();
         serialList.clear();
@@ -198,5 +215,6 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
         mAdapter.notifyDataSetChanged();
         serials.close();
         mDB.close();
+
     }
 }

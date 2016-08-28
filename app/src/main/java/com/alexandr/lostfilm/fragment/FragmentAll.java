@@ -26,33 +26,50 @@ import com.example.alexandr.lostfilm.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefreshListener{
+public class FragmentAll extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
+    public static String FRAGMENT_TAG;
     private List<AllSerials> serialList = new ArrayList<>();
-    private RecyclerView recyclerView;
     private AllSerialAdapter mAdapter;
-    DB mDB;
-    public static FragmentAll FRAGMENT_ALL;
     private SwipeRefreshLayout swipeRefreshLayout;
+    OnFavoriteListChanged mCallback;
+    DB mDB;
+    RecyclerView recyclerView;
 
-    public FragmentAll()
-    {
+    public interface OnFavoriteListChanged {
+        void onFavListChange();
+    }
+
+    public FragmentAll() {
 
     }
 
-    public static FragmentAll newInstance()
-    {
+    public static FragmentAll newInstance() {
         //FragmentAll f = new FragmentAll();
-        FRAGMENT_ALL=new FragmentAll();
-       // return f;
-        return FRAGMENT_ALL;
+        //  return f;
+        return new FragmentAll();
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            mCallback = (OnFavoriteListChanged) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnFavoriteListChanged");
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(
                 R.layout.fragmemt_all, container, false);
 
+        FRAGMENT_TAG = this.getTag();
+        Log.i("debugFragment", "inside All tag=" + FRAGMENT_TAG);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -71,14 +88,12 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                AllSerials movie = serialList.get(position);
-                //Toast.makeText(getContext(), "click: "+movie.getRuName(), Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
             public void onLongClick(View view, int position) {
-                AllSerials movie = serialList.get(position);
-                //Toast.makeText(getContext(),"long click: "+movie.getRuName(),Toast.LENGTH_SHORT).show();
+
             }
         }));
 
@@ -88,7 +103,7 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
     }
 
 
-    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT ) {
+    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
 
 
         @Override
@@ -99,11 +114,14 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
         @Override
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
             //Remove swiped item from list and notify the RecyclerView
-            mDB.open();
+            Log.i("debug_db", "called from FragmentAll, swipe");
+            mDB = new DB(getContext());
+            mDB.openWritable();
             mDB.addToFav(serialList.get(viewHolder.getAdapterPosition()).getRuName());
             mDB.close();
             serialList.remove(viewHolder.getAdapterPosition());
-            FragmentFavorite.FRAGMENT_FAV.refreshRecyclerView();
+            mCallback.onFavListChange();
+
             mAdapter.notifyDataSetChanged();
 
         }
@@ -143,7 +161,7 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
 
             View child = rv.findChildViewUnder(e.getX(), e.getY());
             if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child,rv.getChildAdapterPosition(child) ); //rv.getChildPosition(child)
+                clickListener.onClick(child, rv.getChildAdapterPosition(child)); //rv.getChildPosition(child)
             }
             return false;
         }
@@ -165,14 +183,14 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
         swipeRefreshLayout.setRefreshing(false);
     }
 
-    public void refreshRecyclerView()
-    {
+    public void refreshRecyclerView() {
+        Log.i("debug_db", "called from FragmentAll, refresh");
         mDB = new DB(getContext());
-        mDB.open();
+        mDB.openReadOnly();
 
         Cursor serials = mDB.getAllSerials();
         serialList.clear();
-       // AllSerials serial;
+        // AllSerials serial;
         if (serials.moveToFirst()) {
 
             // определяем номера столбцов по имени в выборке
@@ -185,10 +203,10 @@ public class FragmentAll extends Fragment  implements  SwipeRefreshLayout.OnRefr
             int linkColIndex = serials.getColumnIndex(DB.ALL_COLUMN_LINK);
 
             do {
-               serialList.add(new AllSerials(serials.getString(linkColIndex),serials.getString(ruNameColIndex),
-                       serials.getString(engNamenameColIndex),serials.getString(imgBigColIndex),
-                       serials.getString(imgSmallColIndex),serials.getString(episodeColIndex),
-                       serials.getString(dateColIndex) ));
+                serialList.add(new AllSerials(serials.getString(linkColIndex), serials.getString(ruNameColIndex),
+                        serials.getString(engNamenameColIndex), serials.getString(imgBigColIndex),
+                        serials.getString(imgSmallColIndex), serials.getString(episodeColIndex),
+                        serials.getString(dateColIndex)));
             } while (serials.moveToNext());
         } else
             Log.d("debug", "nothing to select");
