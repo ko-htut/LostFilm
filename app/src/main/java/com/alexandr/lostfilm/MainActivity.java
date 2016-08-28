@@ -2,17 +2,14 @@ package com.alexandr.lostfilm;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -24,53 +21,36 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import com.alexandr.lostfilm.init.AllSerialInitTask;
+
+import com.alexandr.lostfilm.database.DB;
+import com.alexandr.lostfilm.fragment.FragmentAll;
+import com.alexandr.lostfilm.fragment.FragmentFavorite;
+
 import com.example.alexandr.lostfilm.R;
-import com.alexandr.lostfilm.inet.WebParser;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentAll.OnFavoriteListChanged, FragmentFavorite.OnAllListChanged {
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
     public FloatingActionButton fab;
-    private Animation fab_fade_in;
-
-
-
-    private String Settings="Settings";
-    SharedPreferences sPrefSettings ;
-    private String FIRST_RUN="first_run";
     public ProgressDialog dialog;
+    public ViewPager mViewPager;
+    private String FIRST_RUN = "first_run";
+    private Animation fab_fade_in;
+    String Settings = "Settings";
+    SectionsPagerAdapter mSectionsPagerAdapter;
+    SharedPreferences sPrefSettings;
     Drawable fav;
     Drawable all;
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    public ViewPager mViewPager;
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-
-
-        sPrefSettings= getSharedPreferences(Settings,0);
-        if (sPrefSettings.getBoolean(FIRST_RUN,true))
-        {
+        sPrefSettings = getSharedPreferences(Settings, 0);
+        if (sPrefSettings.getBoolean(FIRST_RUN, true)) {
             Log.i("debugFirstTime", "true");
             mViewPager.setCurrentItem(0);
             mViewPager.setCurrentItem(1);
-            dialog = new ProgressDialog(MainActivity.this);
-            dialog.setCancelable(false);
-            dialog.setCanceledOnTouchOutside(false);
-            dialog.setMessage("message");
-            dialog.setTitle("title");
-            dialog.show();
-            AllSerialInitTask task = new AllSerialInitTask();
-            task.execute(MainActivity.this);
-
-            sPrefSettings.edit().putBoolean(FIRST_RUN,false).commit();
-        }
-        else
-        {
+            sPrefSettings.edit().putBoolean(FIRST_RUN, false).apply();
+        } else {
             Log.i("debugFirstTime", "false");
         }
     }
@@ -78,13 +58,18 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        sPrefSettings = getSharedPreferences(Settings, 0);
+        if (sPrefSettings.getBoolean(FIRST_RUN, true)) {
+            Log.i("debug_db", "mainActivityOnCreate");
+            DB db = new DB(getApplicationContext());
+            db.createDB();
+            db.close();
+
+        }
         setContentView(R.layout.activity_main);
-
-
-        fab_fade_in=AnimationUtils.loadAnimation(getApplicationContext(),android.R.anim.fade_in);
+        fab_fade_in = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
-        fav = ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_action_refresh);
+        fav = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_action_refresh);
         all = ContextCompat.getDrawable(getApplicationContext(), android.R.drawable.ic_input_add);
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -99,12 +84,11 @@ public class MainActivity extends AppCompatActivity {
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
         }
-        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
-            public void onPageSelected (int position){
+            public void onPageSelected(int position) {
 
-                if (position==0)
-                {
+                if (position == 0) {
                     fab.startAnimation(fab_fade_in);
                     fab.setImageDrawable(fav);
 
@@ -115,14 +99,13 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                 }
-                if (position==1)
-                {
+                if (position == 1) {
                     fab.startAnimation(fab_fade_in);
                     fab.setImageDrawable(all);
                     fab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
-                        allFabAction();
+                            allFabAction();
                         }
                     });
                 }
@@ -174,18 +157,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void allFabAction ()
-    {
-          //Toast.makeText(getApplicationContext(),"fab",Toast.LENGTH_LONG).show();
+    private void allFabAction() {
 
     }
 
-    private void favFabAction()
-    {
-       // Toast.makeText(getApplicationContext(),"fav",Toast.LENGTH_LONG).show();
-        WebParser wb = new WebParser();
-        wb.parseNewSeries();
+    private void favFabAction() {
 
+
+    }
+
+    @Override
+    public void onFavListChange() {
+        FragmentFavorite fragmentFav = (FragmentFavorite)
+                getSupportFragmentManager().findFragmentByTag(FragmentFavorite.FRAGMENT_TAG);
+        if (fragmentFav != null) {
+            fragmentFav.refreshRecyclerView();
+        }
+    }
+
+    @Override
+    public void onAllListChange() {
+        FragmentAll fragmentAll = (FragmentAll)
+                getSupportFragmentManager().findFragmentByTag(FragmentAll.FRAGMENT_TAG);
+        if (fragmentAll != null) {
+            fragmentAll.refreshRecyclerView();
+        }
     }
 
     /**
