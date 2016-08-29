@@ -75,7 +75,7 @@ public class WebParser {
         //return result;
     }
 
-    public ArrayList<AllSerials> parseAllSerials() {
+    public ArrayList<AllSerials> parseReallyAllSerials() {
 
         ArrayList<AllSerials> result = new ArrayList<>();
         HTTPUrl download = new HTTPUrl();
@@ -91,20 +91,17 @@ public class WebParser {
                     ("(?imsd)<a href=\"([^\"]+).*?\" class=\"bb_a\">(.*?)<br><span>(.*?)</span>");
             Matcher matcher = pattern.matcher(source);
 
-          //  DB db = new DB(mCtx);
-          //  db.open();
+
             while (matcher.find()) {
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
-                //  db.addToAll(link,ru,en);
-                //  Log.i("debug",ru);
-                //result.add(new AllSerials(link,ru,en));
-                    try {
-                        parseAllDetail(new URL(baseURL + link), ru, en);
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    }
+
+                try {
+                    parseAllDetail(new URL(baseURL + link), ru, en);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
 
             }
             mDB.close();
@@ -116,7 +113,7 @@ public class WebParser {
         return result;
     }
 
-    public ArrayList<AllSerials> parseReallyAllSerials() {
+    public ArrayList<AllSerials> parseAllSerials() {
 
         ArrayList<AllSerials> result = new ArrayList<>();
         HTTPUrl download = new HTTPUrl();
@@ -143,7 +140,7 @@ public class WebParser {
                     ruNames.add(all.getString(ruNameColIndex));
                 } while (all.moveToNext());
             } else {
-                //something goes wrong
+                Log.i("debugWebParser","db is empty");
             }
             db.close();
 
@@ -151,7 +148,7 @@ public class WebParser {
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
-                if (!ruNames.contains(ru)|| ruNames.isEmpty()) {
+                if (!ruNames.contains(ru) || ruNames.isEmpty()) {
                     try {
 
                         parseAllDetail(new URL(baseURL + link), ru, en);
@@ -179,21 +176,16 @@ public class WebParser {
             Matcher matcher = pattern.matcher(element.text());
             matcher.find();
             String status = matcher.group(1).trim();
-            //if (!status.equals("закончен")) {  here
-            //Log.i("debugStatus",status);
-            Element pic = element.select("img").first();
-            String pic_link = pic.attr("src");
-            //Log.i("debugDetail",pic_link);
 
-            // Log.i("debugDetail"," status: "+status);
+            Element pic = element.select("img").first();
+            String pic_link = baseURL+pic.attr("src");
+
             Element lastEpisode = element.select("span.micro").first();
-            //Log.i("debugDetail"," micro: "+lastEpisode.text());
+
             String[] info = lastEpisode.text().split(",");
-            //Log.i("debugDetail"," date: "+info[0]);
-            //Log.i("debugDetail"," episode: "+info[1]);
-            //Log.i("debugDetail"," ");
+
             Element lastEpisodeName = element.select("td.t_episode_title").first();
-            //Log.i("debugDetailTest",lastEpisodeName.text());
+
             String descr_ru;
             String descr_eng;
             if (lastEpisodeName.text().contains("(")) {
@@ -208,13 +200,11 @@ public class WebParser {
             descr_eng = descr_eng.replace("(", "");
             descr_eng = descr_eng.replace(")", "").trim();
 
-            //Log.i("debugDetail", descr_ru);
-            // Log.i("debugDetail", descr_eng);
 
             mDB.addToAll(link.toString(), ru, eng, status.trim(), pic_link,
                     bigPicToSmall(pic_link), info[0], info[1], descr_ru, descr_eng, 0);
+            Log.i("debug_webparser",pic_link);
 
-            //} and here
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -225,45 +215,5 @@ public class WebParser {
         link = link.replace("poster", "cat");
         return link;
     }
-
-/*
-    public void convert(File f) {
-        FileInputStream fis;
-        System.out.println(f.getAbsolutePath());
-        byte[] bFile = new byte[(int) f.length()];
-        try {
-            //convert file into array of bytes
-            fis = new FileInputStream(f);
-            fis.read(bFile);
-            fis.close();
-
-            String testCharset = new String(bFile, "Cp1251");
-            File newFile = new File(f.getAbsolutePath() + "newFile.txt");
-            System.out.println(newFile.getAbsolutePath());
-            FileWriter fw = new FileWriter(newFile);
-            fw.write(testCharset);
-            fw.flush();
-            fw.close();
-            readFile(newFile);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Done");
-    }
-
-    private String readFile(File f) {
-        FileReader fr = null;
-        try {
-            fr = new FileReader(f);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        System.out.println(fr.toString());
-        return null;
-    }*/
 
 }

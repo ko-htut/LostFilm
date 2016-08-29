@@ -1,13 +1,19 @@
 package com.alexandr.lostfilm.adapter;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.database.FavSerials;
 import com.example.alexandr.lostfilm.R;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 
 import java.util.List;
@@ -18,6 +24,7 @@ import java.util.List;
 public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.FavSerialViewHolder>{
 
     private List<FavSerials> listFav;
+    private Context mCtx;
 
     @Override
     public FavSerialViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -27,12 +34,30 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
     }
 
     @Override
-    public void onBindViewHolder(FavSerialViewHolder holder, int position) {
-        FavSerials serial = listFav.get(position);
+    public void onBindViewHolder(final FavSerialViewHolder holder, int position) {
+        final FavSerials serial = listFav.get(position);
         holder.ruName.setText(serial.getName());
         holder.ruDetail.setText(serial.getDescr_ru());
         holder.date.setText(serial.getDate());
         holder.episode.setText(serial.getSeason());
+        Picasso.with(mCtx).load(serial.getPic_link())
+                .error(R.drawable.error)
+                .resize(200,200)
+                .into(holder.img, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+                    @Override
+                    public void onError() {
+
+                        Picasso.with(mCtx).load(serial.getPic_link_big())
+                                .error(R.drawable.error)
+                                .resize(200,200)
+                                .into(holder.img);
+
+                    }
+                });
         //holder.allImg.setImageDrawable(R.mipmap.ic_launcher);
     }
 
@@ -56,8 +81,10 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
         }
     }
 
-    public FavSerialsAdapter(List<FavSerials> favList) {
+    public FavSerialsAdapter(List<FavSerials> favList,Context context) {
+
         this.listFav = favList;
+        this.mCtx=context;
     }
 
 

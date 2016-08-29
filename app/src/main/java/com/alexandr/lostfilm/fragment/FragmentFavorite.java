@@ -76,7 +76,7 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_fav);
         swipeRefreshLayout.setOnRefreshListener(this);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.fav_recycler_view);
-        mAdapter = new FavSerialsAdapter(serialList);
+        mAdapter = new FavSerialsAdapter(serialList,getContext());
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -208,7 +208,7 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
             do {
                 serialList.add(new FavSerials(serials.getString(episodeColIndex),serials.getString(ruNameColIndex),
                         serials.getString(imgSmallColIndex), serials.getString(descr_ru),serials.getString(descr_eng),
-                        serials.getString(dateColIndex)));
+                        serials.getString(dateColIndex),serials.getString(imgBigColIndex)));
             } while (serials.moveToNext());
         } else
             Log.d("debug", "nothing to select");

@@ -10,15 +10,18 @@ public class FavSerials {
     String descr_ru;
     String descr_eng;
     String date;
+    String pic_link_big;
 
 
-    public FavSerials(String season, String name, String pic_link, String descr_ru, String descr_eng, String date) {
+    public FavSerials(String season, String name, String pic_link, String descr_ru, String descr_eng, String date, String big_pic) {
         this.season = season;
         this.name = name;
         this.pic_link = pic_link;
+        this.pic_link_big=big_pic;
         this.descr_ru = descr_ru;
         this.descr_eng = descr_eng;
         this.date = date;
+
     }
 
     public String getSeason() {
@@ -56,6 +59,14 @@ public class FavSerials {
 
     public String getDescr_eng() {
         return descr_eng;
+    }
+
+    public String getPic_link_big() {
+        return pic_link_big;
+    }
+
+    public void setPic_link_big(String pic_link_big) {
+        this.pic_link_big = pic_link_big;
     }
 
     public void setDescr_eng(String descr_eng) {

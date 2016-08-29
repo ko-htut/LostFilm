@@ -26,6 +26,7 @@ import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.fragment.FragmentAll;
 import com.alexandr.lostfilm.fragment.FragmentFavorite;
 
+import com.alexandr.lostfilm.task.FullFillDbTask;
 import com.example.alexandr.lostfilm.R;
 
 public class MainActivity extends AppCompatActivity implements FragmentAll.OnFavoriteListChanged, FragmentFavorite.OnAllListChanged {
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
             Log.i("debug_db", "mainActivityOnCreate");
             DB db = new DB(getApplicationContext());
             db.createDB();
+//            db.formatDB();
             db.close();
 
         }
@@ -158,7 +160,8 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
 
 
     private void allFabAction() {
-
+        FullFillDbTask task = new FullFillDbTask();
+        task.execute(this);
     }
 
     private void favFabAction() {

@@ -74,7 +74,7 @@ public class FragmentAll extends Fragment implements SwipeRefreshLayout.OnRefres
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout_all);
         swipeRefreshLayout.setOnRefreshListener(this);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.all_recycler_view);
-        mAdapter = new AllSerialAdapter(serialList);
+        mAdapter = new AllSerialAdapter(serialList,getContext());
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(mLayoutManager);

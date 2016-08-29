@@ -1,4 +1,4 @@
-package com.alexandr.lostfilm.init;
+package com.alexandr.lostfilm.task;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -49,34 +49,6 @@ public class AllSerialInitTask extends AsyncTask<MainActivity, Void, Void> {
         WebParser wb = new WebParser(mCtx);
         wb.parseAllSerials();
 
-        /*DB db = new DB(mCtx);
-        db.open();
-
-        HTTPUrl download = new HTTPUrl();
-
-        String parseString = download.getCodeByUrlToString(WebParser.ALL);
-        if (parseString!=null) {
-            String source = parseString.toString();
-            source = source.substring(source.indexOf("<!-- ### Полный список сериалов -->"),source.length());
-            source = source.substring(0,source.indexOf("<br />"));
-
-            Pattern pattern = Pattern.compile
-                    ("(?imsd)<a href=\"([^\"]+).*?\" class=\"bb_a\">(.*?)<br><span>(.*?)</span>");
-            Matcher matcher = pattern.matcher(source);
-
-            while (matcher.find())
-            {
-                String link = matcher.group(1);
-                String ru = matcher.group(2);
-                String en = matcher.group(3);
-                db.addToAll(link,ru,en);
-                //Log.i("debug",ru);
-            }
-            Log.i("debug","all serial parsed");
-        } else {
-            Log.i("PHP", "it is null");
-        }
-        db.close();*/
         return null;
     }
 }

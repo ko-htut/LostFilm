@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.alexandr.lostfilm.inet.WebParser;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -84,7 +86,7 @@ public class DB {
     // получить все данные из таблицы DB_TABLE
     public Cursor getAllSerials() {
         System.out.println(mDB.toString());
-        return mDB.query(DB_TABLE_SERIALS, null, "isFavorite=0", null, null, null, null);
+        return mDB.query(DB_TABLE_SERIALS, null, "isFavorite=0 AND status!=\'закончен\'", null, null, null, null);
     }
 
 
@@ -145,6 +147,18 @@ public class DB {
     // удалить запись из DB_TABLE ALL
     public void delFromAll(String ruName) {
         mDB.delete(DB_TABLE_SERIALS, ALL_COLUMN_RU_NAME + " = " + ruName, null);
+    }
+
+    public void updatePicLink(String ruName,String picture)
+    {
+        ContentValues cv = new ContentValues();
+        cv.put(ALL_COLUMN_SMALL_PICTURE,picture);
+        mDB.update(DB_TABLE_SERIALS,cv,ALL_COLUMN_RU_NAME,new String[]{ruName});
+    }
+
+    public void formatDB()
+    {
+     mDB.delete(DB_TABLE_SERIALS,null,null);
     }
 
     public void createDB()

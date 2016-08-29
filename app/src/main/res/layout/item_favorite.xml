@@ -9,7 +9,7 @@
         android:id="@+id/favImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher">
+        >
     </ImageView>
 
 
@@ -38,9 +38,11 @@
         android:layout_width="wrap_content"
         android:id="@+id/favDate"
         android:paddingTop="10dp"
+        android:paddingLeft="10dp"
         android:text="24.02.1993 23:15"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" />
+        android:layout_below="@+id/favTVDetailRu"
+        android:layout_alignLeft="@+id/favTVDetailRu"
+        android:layout_alignStart="@+id/favTVDetailRu" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -48,8 +50,9 @@
         android:id="@+id/favEpisode"
         android:text="01.01"
         android:paddingTop="10dp"
-        android:layout_below="@+id/favDate"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:paddingLeft="10dp"
+        android:layout_toRightOf="@id/favDate"
+        android:layout_below="@id/favTVDetailRu"
+        />
 
 </RelativeLayout>
