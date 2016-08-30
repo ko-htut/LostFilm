@@ -11,9 +11,12 @@ import android.widget.TextView;
 
 import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.database.FavSerials;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.alexandr.lostfilm.R;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+
 
 
 import java.util.List;
@@ -25,6 +28,7 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
 
     private List<FavSerials> listFav;
     private Context mCtx;
+
 
     @Override
     public FavSerialViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -40,25 +44,39 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
         holder.ruDetail.setText(serial.getDescr_ru());
         holder.date.setText(serial.getDate());
         holder.episode.setText(serial.getSeason());
-        Picasso.with(mCtx).load(serial.getPic_link())
-                .error(R.drawable.error)
-                .resize(200,200)
-                .into(holder.img, new Callback() {
+        Glide.with(mCtx)
+                .load(serial.getPic_link())
+                .override(275, 275) // resize
+                .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
-                    public void onSuccess() {
-
-                    }
-                    @Override
-                    public void onError() {
-
-                        Picasso.with(mCtx).load(serial.getPic_link_big())
-                                .error(R.drawable.error)
-                                .resize(200,200)
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        if (serial.getPic_link().endsWith("jpg"))
+                        {
+                            serial.setPic_link(serial.getPic_link().replace("jpg","jpeg"));
+                            Log.i("debugblide","подправленный: "+serial.getPic_link());
+                        }
+                        else
+                        {
+                            serial.setPic_link(serial.getPic_link().replace("jpeg","jpg"));
+                            Log.i("debugblide","подправленный: "+serial.getPic_link());
+                        }
+                        DB db = new DB(mCtx);
+                        db.openWritable();
+                        db.updatePicLink(serial.getName(),serial.getPic_link());
+                        db.close();
+                        Glide.with(mCtx)
+                                .load(serial.getPic_link())
+                                .override(275, 275) // resize
                                 .into(holder.img);
-
+                        return false;
                     }
-                });
-        //holder.allImg.setImageDrawable(R.mipmap.ic_launcher);
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .into(holder.img);
     }
 
     @Override

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
 
     android:weightSum="1"
-    android:id="@+id/relativelayout">
+    android:id="@+id/item_all_relativelayout">
     <ImageView
         android:id="@+id/allImg"
         android:layout_width="wrap_content"
@@ -38,11 +38,12 @@
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:id="@+id/allDate"
-        android:paddingTop="10dp"
+
         android:paddingLeft="10dp"
         android:text="24.02.1993 23:15"
         android:layout_toRightOf="@+id/allImg"
         android:layout_below="@+id/allTVnameEng"
+        android:layout_alignParentBottom="true"
         android:layout_toEndOf="@+id/allImg"/>
 
     <TextView
@@ -50,9 +51,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/allEpisode"
         android:text="01.01"
-        android:paddingTop="10dp"
         android:layout_alignTop="@+id/allDate"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"/>
 
 </RelativeLayout>

@@ -153,7 +153,8 @@ public class DB {
     {
         ContentValues cv = new ContentValues();
         cv.put(ALL_COLUMN_SMALL_PICTURE,picture);
-        mDB.update(DB_TABLE_SERIALS,cv,ALL_COLUMN_RU_NAME,new String[]{ruName});
+
+        mDB.update(DB_TABLE_SERIALS,cv,ALL_COLUMN_RU_NAME+"=?",new String[] {ruName});
     }
 
     public void formatDB()

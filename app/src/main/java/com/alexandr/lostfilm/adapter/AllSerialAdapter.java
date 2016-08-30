@@ -7,13 +7,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alexandr.lostfilm.database.AllSerials;
 import com.alexandr.lostfilm.database.DB;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.alexandr.lostfilm.R;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
+
 
 import java.util.List;
 
@@ -30,7 +34,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
     public class AllSerialViewHolder extends RecyclerView.ViewHolder {
         public TextView ruName, engName, date,episode;
         public ImageView allImg;
-
+        private RelativeLayout layout;
         public AllSerialViewHolder(View view) {
             super(view);
             allImg = (ImageView) view.findViewById(R.id.allImg);
@@ -38,6 +42,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
             engName = (TextView) view.findViewById(R.id.allTVnameEng);
             episode = (TextView) view.findViewById(R.id.allEpisode);
             date = (TextView) view.findViewById(R.id.allDate);
+            layout= (RelativeLayout) view.findViewById(R.id.item_all_relativelayout);
         }
     }
 
@@ -61,43 +66,45 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
         holder.engName.setText(serial.getEngName());
         holder.date.setText(serial.getDate());
         holder.episode.setText(serial.getEpisode());
-        Picasso.with(mCtx).load(serial.getImg_small())
-                .error(R.drawable.error)
-                .resize(200,200)
-                .into(holder.allImg, new Callback() {
-                    boolean retry=false;
+        holder.layout.getHeight();
+
+        //Log.i("golders layout","NAME: "+serial.getRuName()+" height: "+holder.layout.getHeight()+" width: "+holder.layout.getWidth());
+
+        Glide.with(mCtx)
+                .load(serial.getImg_small())
+                .override(275, 275) // resize
+
+                .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
-                    public void onSuccess() {
-                        if (retry)
-                        {
-                            retry=false;
-                            DB db = new DB(mCtx);
-                            db.updatePicLink(serial.getRuName(),serial.getImg_small());
-                            Log.i("debugPicasso","updated: "+serial.getRuName());
-                        }
-                    }
-                    @Override
-                    public void onError() {
-                        Log.i("debugPicasso","error: "+serial.getImg_small());
-                        /*if (serial.getImg_small().endsWith("jpg"))
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        if (serial.getImg_small().endsWith("jpg"))
                         {
                             serial.setImg_small(serial.getImg_small().replace("jpg","jpeg"));
-                            retry=true;
+                            Log.i("debugblide","подправленный: "+serial.getImg_small());
                         }
-                        if (serial.getImg_small().endsWith("jpeg"))
+                        else
                         {
                             serial.setImg_small(serial.getImg_small().replace("jpeg","jpg"));
-                            retry=true;
-                        }*/
-
-                        Log.i("debugPicasso",serial.getImg_small());
-                        Picasso.with(mCtx).load(serial.getImg_big())
-                                .error(R.drawable.error)
-                                .resize(200,200)
+                            Log.i("debugblide","подправленный: "+serial.getImg_small());
+                        }
+                        DB db = new DB(mCtx);
+                        db.openWritable();
+                        db.updatePicLink(serial.getRuName(),serial.getImg_small());
+                        db.close();
+                        Glide.with(mCtx)
+                                .load(serial.getImg_small())
+                                .override(275, 275) // resize
                                 .into(holder.allImg);
-
+                        return false;
                     }
-                });
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        return false;
+                    }
+                })
+                .into(holder.allImg);
+
     }
 
     @Override
