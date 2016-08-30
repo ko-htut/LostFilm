@@ -17,7 +17,7 @@
     <TextView android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:id="@+id/allTVnameRu"
-            android:paddingLeft="10dp"
+            android:paddingLeft="4dp"
             android:paddingTop="10dp"
             android:layout_toRightOf="@id/allImg"
             android:text="Викинги"
@@ -27,7 +27,7 @@
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:id="@+id/allTVnameEng"
-        android:paddingLeft="10dp"
+        android:paddingLeft="4dp"
         android:text="(Vikings)"
         android:textSize="20sp"
         android:layout_weight="1"
@@ -38,12 +38,11 @@
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         android:id="@+id/allDate"
-
-        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:paddingLeft="4dp"
         android:text="24.02.1993 23:15"
-        android:layout_toRightOf="@+id/allImg"
         android:layout_below="@+id/allTVnameEng"
-        android:layout_alignParentBottom="true"
+        android:layout_toRightOf="@+id/allImg"
         android:layout_toEndOf="@+id/allImg"/>
 
     <TextView
@@ -51,9 +50,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/allEpisode"
         android:text="01.01"
+        android:paddingTop="10dp"
         android:layout_alignTop="@+id/allDate"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>
