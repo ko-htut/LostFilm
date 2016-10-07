@@ -33,7 +33,7 @@ public class FragmentFavorite extends Fragment implements  SwipeRefreshLayout.On
     RecyclerView recyclerView;
     private FavSerialsAdapter mAdapter;
     DB mDB;
-    private SwipeRefreshLayout swipeRefreshLayout;
+    public SwipeRefreshLayout swipeRefreshLayout;
     //public static FragmentFavorite FRAGMENT_FAV;
     public static String FRAGMENT_TAG;
     OnAllListChanged mCallback;

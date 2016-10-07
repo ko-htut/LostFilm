@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.database.FavSerials;
+import com.alexandr.lostfilm.util.ConvertDensity;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -28,7 +29,7 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
 
     private List<FavSerials> listFav;
     private Context mCtx;
-
+    private int imgSize=120;
 
     @Override
     public FavSerialViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -39,6 +40,7 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
 
     @Override
     public void onBindViewHolder(final FavSerialViewHolder holder, int position) {
+
         final FavSerials serial = listFav.get(position);
         holder.ruName.setText(serial.getName());
         holder.ruDetail.setText(serial.getDescr_ru());
@@ -46,7 +48,7 @@ public class FavSerialsAdapter extends RecyclerView.Adapter<FavSerialsAdapter.Fa
         holder.episode.setText(serial.getSeason());
         Glide.with(mCtx)
                 .load(serial.getPic_link())
-                .override(275, 275) // resize
+                .override(ConvertDensity.convertDpToPixel(imgSize), ConvertDensity.convertDpToPixel(imgSize)) // resize
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {

@@ -1,9 +1,14 @@
 package com.alexandr.lostfilm;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -21,26 +26,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import com.alexandr.lostfilm.database.DB;
 import com.alexandr.lostfilm.fragment.FragmentAll;
 import com.alexandr.lostfilm.fragment.FragmentFavorite;
 
-import com.alexandr.lostfilm.task.FullFillDbTask;
+import com.alexandr.lostfilm.notification.CustomNotification;
+import com.alexandr.lostfilm.receivers.CheckNewSerialsReceiver;
+import com.alexandr.lostfilm.receivers.UpdateAllReceiver;
+import com.alexandr.lostfilm.receivers.UpdateFavReceiver;
+import com.alexandr.lostfilm.settings.SettingActivity;
+import com.alexandr.lostfilm.task.CheckNewSerialsTask;
+import com.alexandr.lostfilm.task.FavSerialUpdateTask;
 import com.example.alexandr.lostfilm.R;
 
 public class MainActivity extends AppCompatActivity implements FragmentAll.OnFavoriteListChanged, FragmentFavorite.OnAllListChanged {
 
     public FloatingActionButton fab;
-    public ProgressDialog dialog;
     public ViewPager mViewPager;
     private String FIRST_RUN = "first_run";
     private Animation fab_fade_in;
     String Settings = "Settings";
     SectionsPagerAdapter mSectionsPagerAdapter;
     SharedPreferences sPrefSettings;
+    AlarmManagerScheduler scheduler;
+    Intent actionIntentAll;
+    Intent actionIntentFav;
+    Intent actionIntentCheckNew;
     Drawable fav;
     Drawable all;
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        onAllListChange();
+        onFavListChange();
+    }
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
@@ -50,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
             Log.i("debugFirstTime", "true");
             mViewPager.setCurrentItem(0);
             mViewPager.setCurrentItem(1);
+
+
             sPrefSettings.edit().putBoolean(FIRST_RUN, false).apply();
         } else {
             Log.i("debugFirstTime", "false");
@@ -59,15 +83,20 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        scheduler = new AlarmManagerScheduler(getApplicationContext());
         sPrefSettings = getSharedPreferences(Settings, 0);
+        scheduler.setAlarms();
+        actionIntentAll = new Intent(getApplicationContext(), UpdateAllReceiver.class);
+        actionIntentFav = new Intent(getApplicationContext(), UpdateFavReceiver.class);
+        actionIntentCheckNew = new Intent(getApplicationContext(), CheckNewSerialsReceiver.class);
+
         if (sPrefSettings.getBoolean(FIRST_RUN, true)) {
             Log.i("debug_db", "mainActivityOnCreate");
             DB db = new DB(getApplicationContext());
             db.createDB();
-//            db.formatDB();
             db.close();
-
         }
+
         setContentView(R.layout.activity_main);
         fab_fade_in = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in);
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -80,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
         setSupportActionBar(toolbar);
 
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-
         mViewPager = (ViewPager) findViewById(R.id.container);
         if (mViewPager != null) {
             mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -93,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
                 if (position == 0) {
                     fab.startAnimation(fab_fade_in);
                     fab.setImageDrawable(fav);
-
                     fab.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -152,6 +178,8 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent i = new Intent(this, SettingActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -160,11 +188,20 @@ public class MainActivity extends AppCompatActivity implements FragmentAll.OnFav
 
 
     private void allFabAction() {
-        FullFillDbTask task = new FullFillDbTask();
-        task.execute(this);
+        String all = String.valueOf(scheduler.checkAlarm(actionIntentAll, PendingIntent.FLAG_UPDATE_CURRENT));
+        String fav = String.valueOf(scheduler.checkAlarm(actionIntentFav, PendingIntent.FLAG_UPDATE_CURRENT));
+        String check = String.valueOf(scheduler.checkAlarm(actionIntentCheckNew, PendingIntent.FLAG_UPDATE_CURRENT));
+        Toast.makeText(this, "all:" + all + " fav:" + fav + " check:" + check, Toast.LENGTH_SHORT).show();
     }
 
     private void favFabAction() {
+        FragmentFavorite fragmentFav = (FragmentFavorite)
+                getSupportFragmentManager().findFragmentByTag(FragmentFavorite.FRAGMENT_TAG);
+        if (fragmentFav != null) {
+            fragmentFav.swipeRefreshLayout.setRefreshing(true);
+        }
+        FavSerialUpdateTask update = new FavSerialUpdateTask();
+        update.execute(this);
 
 
     }

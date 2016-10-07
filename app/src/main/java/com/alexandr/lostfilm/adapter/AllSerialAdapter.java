@@ -30,6 +30,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
 
     private List<AllSerials> listAll;
     private Context mCtx;
+    private int imgSize=234;
 
     public class AllSerialViewHolder extends RecyclerView.ViewHolder {
         public TextView ruName, engName, date,episode;
@@ -41,7 +42,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
             ruName = (TextView) view.findViewById(R.id.allTVnameRu);
             engName = (TextView) view.findViewById(R.id.allTVnameEng);
             episode = (TextView) view.findViewById(R.id.allEpisode);
-            date = (TextView) view.findViewById(R.id.allDate);
+            //date = (TextView) view.findViewById(R.id.allDate);
             layout= (RelativeLayout) view.findViewById(R.id.item_all_relativelayout);
         }
     }
@@ -64,16 +65,16 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
         final AllSerials serial = listAll.get(position);
         holder.ruName.setText(serial.getRuName());
         holder.engName.setText(serial.getEngName());
-        holder.date.setText(serial.getDate());
+        //holder.date.setText(serial.getDate());
         holder.episode.setText(serial.getEpisode());
-        holder.layout.getHeight();
-
+        //holder.layout.getHeight();
+      //  Log.i("debugAllItem",holder.engName.getText()+" "+String.valueOf(holder.engName.getBottom()));
+    //    Log.i("debugAllItem","layoutSize "+String.valueOf(holder.layout.getHeight()));
         //Log.i("golders layout","NAME: "+serial.getRuName()+" height: "+holder.layout.getHeight()+" width: "+holder.layout.getWidth());
 
         Glide.with(mCtx)
                 .load(serial.getImg_small())
-                .override(275, 275) // resize
-
+                .override(imgSize, imgSize) // resize
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -93,7 +94,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
                         db.close();
                         Glide.with(mCtx)
                                 .load(serial.getImg_small())
-                                .override(275, 275) // resize
+                                .override(imgSize, imgSize) // resize
                                 .into(holder.allImg);
                         return false;
                     }

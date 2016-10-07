@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId 'com.alexandr.lostfilm'
-        minSdkVersion 10
+        minSdkVersion 11
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.android.support:support-v4:23.4.0'
 }

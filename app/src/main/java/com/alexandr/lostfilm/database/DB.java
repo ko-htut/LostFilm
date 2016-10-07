@@ -90,19 +90,22 @@ public class DB {
     }
 
 
-    // should be deleted from here
+
     public Cursor getReallyAllSerials() {
-//        System.out.println(mDB.toString());
+
         return mDB.query(DB_TABLE_SERIALS, null, null, null, null, null, null);
     }
-    //till here
+
 
     public Cursor getFavSerials() {
         System.out.println(mDB.toString());
         return mDB.query(DB_TABLE_SERIALS, null, "isFavorite!=0", null, null, null, null);
     }
 
-
+    public Cursor getSerial(String ru)
+    {
+        return mDB.query(DB_TABLE_SERIALS, null, "ruName=?", new String []{ru}, null, null, null);
+    }
 
     public void addToFav(String ruName) {
         // подготовим значения для обновления
@@ -155,6 +158,21 @@ public class DB {
         cv.put(ALL_COLUMN_SMALL_PICTURE,picture);
 
         mDB.update(DB_TABLE_SERIALS,cv,ALL_COLUMN_RU_NAME+"=?",new String[] {ruName});
+    }
+
+    public void updateSerial(String toChangeRuName,String episode,String detailRu, String detailEng,String status, String date)
+    {
+        if(!mDB.isOpen())
+        {
+            mDB=mDBHelper.getWritableDatabase();
+        }
+        ContentValues cv = new ContentValues();
+        cv.put(ALL_COLUMN_LAST_EPISODE,episode);
+        cv.put(ALL_COLUMN_DETAIL_RU,detailRu);
+        cv.put(ALL_COLUMN_DETAIL_ENG,detailEng);
+        cv.put(ALL_COLUMN_STATUS,status);
+        cv.put(ALL_COLUMN_DATE,date);
+        mDB.update(DB_TABLE_SERIALS,cv,ALL_COLUMN_RU_NAME+"=?",new String[] {toChangeRuName});
     }
 
     public void formatDB()

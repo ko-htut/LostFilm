@@ -36,22 +36,13 @@
 
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:id="@+id/allDate"
-        android:paddingTop="10dp"
+        android:id="@+id/allEpisode"
         android:paddingLeft="4dp"
         android:text="24.02.1993 23:15"
-        android:layout_below="@+id/allTVnameEng"
-        android:layout_toRightOf="@+id/allImg"
-        android:layout_toEndOf="@+id/allImg"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/allEpisode"
-        android:text="01.01"
-        android:paddingTop="10dp"
-        android:layout_alignTop="@+id/allDate"
+        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        />
+
+
 
 </RelativeLayout>

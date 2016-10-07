@@ -1,27 +1,24 @@
 package com.alexandr.lostfilm.inet;
 
+
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Environment;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
-
 import com.alexandr.lostfilm.database.AllSerials;
 import com.alexandr.lostfilm.database.DB;
-import com.alexandr.lostfilm.database.FavSerials;
-import com.alexandr.lostfilm.inet.HTTPUrl;
+import com.alexandr.lostfilm.notification.CustomNotification;
+import com.alexandr.lostfilm.notification.NotificationDisplay;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +30,6 @@ public class WebParser {
     private DB mDB;
 
 
-    //public WebParser() {   }
 
     public WebParser(Context ctx) {
         this.mCtx = ctx;
@@ -41,38 +37,124 @@ public class WebParser {
         mDB.openWritable();
     }
 
-    public void parseNewSeries() {
-        HTTPUrl download = new HTTPUrl();
 
-        String parseString = download.getCodeByUrlToString(NEW);
-        if (parseString != null) {
-            String source = parseString.toString();
-            source = source.substring(source.indexOf("<div class=\"content_body\">"), source.length());
-            source = source.substring(0, source.indexOf("d_pages_link"));
-            source = source.replace("<div class=\"content_body\">", "<br clear=both> <br clear=both>");
-
-            Pattern pattern = Pattern.compile
-                    ("(?imsd)<br clear=both>\\s*<br clear=both>.*?<!--\\s*([0-9]{2}\\.[0-9]{2}).*?000000\">(.*?)</span>.*?<img src=\"([^\"]+)\".*?<b>(.*?)</b>.*?<b>(.*?)</b>");
-            Matcher matcher = pattern.matcher(source);
-
-            ArrayList<FavSerials> result = new ArrayList<>();
-            while (matcher.find()) {
-
-            }
-            /**
-             $seasons = $matches[1]; // Сезоны
-             $titles = $matches[2]; // Названия
-             $images = $matches[3]; // Пути к картинкам
-             $descriptions = $matches[4]; // Описания
-             $dates = $matches[5]; // Даты
-             */
-            // String out = matcher.group(1)+" "+matcher.group(2)+" "+matcher.group(3)+" "+matcher.group(4)+" "+matcher.group(5);
-
-
-        } else {
-            Log.i("PHP", "it is null");
+    public void parseSerial(String link,String date,String ruName)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)mCtx.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork==null|| activeNetwork.isConnectedOrConnecting()==false){return;}
+        boolean isConnected = activeNetwork.isConnectedOrConnecting();
+        if(!isConnected)
+        {
+            return;
         }
-        //return result;
+        Document doc = null;
+        try
+        {
+            doc = Jsoup.parse(new URL(link), 5000);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        Element element = doc.select("div.mid").first();
+ // parse status
+        Pattern pattern = Pattern.compile
+                ("(?imsd)Статус: (.*?)Сайт");
+        Matcher matcher = pattern.matcher(element.text());
+        matcher.find();
+        String status = matcher.group(1).trim();
+ // parse lastEpisode
+        Element lastEpisode = element.select("span.micro").first();
+        String[] info = lastEpisode.text().split(",");
+        if(info[0].equals(date))
+        {return;}
+// detail ru eng
+        Element lastEpisodeName = element.select("td.t_episode_title").first();
+        String descr_ru;
+        String descr_eng;
+        if (lastEpisodeName.text().contains("(")) {
+            descr_ru = lastEpisodeName.text().substring(0, lastEpisodeName.text().indexOf("(")).trim();
+            descr_eng = lastEpisodeName.text().substring(lastEpisodeName.text().indexOf("("),
+                    lastEpisodeName.text().length());
+        } else {
+            descr_ru = lastEpisodeName.text().trim();
+            descr_eng = "";
+        }
+        descr_eng = descr_eng.replace("(", "");
+        descr_eng = descr_eng.replace(")", "").trim();
+        mDB.updateSerial(ruName,info[1],descr_ru,descr_eng,status,info[0]);
+
+    }
+
+    public NotificationDisplay parseFavSerial(String link, String date, String ruName)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)mCtx.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if( activeNetwork==null|| activeNetwork.isConnectedOrConnecting()==false){return null;}
+        boolean isConnected = activeNetwork.isConnectedOrConnecting();
+        if(!isConnected)
+        {
+            return null;
+        }
+        Document doc = null;
+        try
+        {
+            Log.i("debugLink",link);
+            doc = Jsoup.parse(new URL(link), 5000);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        try {
+            Element element = doc.select("div.mid").first();
+            // parse status
+            Pattern pattern = Pattern.compile
+                    ("(?imsd)Статус: (.*?)Сайт");
+            Matcher matcher = pattern.matcher(element.text());
+            matcher.find();
+            String status = matcher.group(1).trim();
+            // parse lastEpisode
+            // info[0] = date, info[1]=episode
+            Element lastEpisode = element.select("span.micro").first();
+            String[] info = lastEpisode.text().split(",");
+            if (info[0].equals(date)) {
+                return null;
+            }
+// detail ru eng
+            Element lastEpisodeName = element.select("td.t_episode_title").first();
+
+            String descr_ru;
+            String descr_eng;
+            if (lastEpisodeName.text().contains("(")) {
+                descr_ru = lastEpisodeName.text().substring(0, lastEpisodeName.text().indexOf("(")).trim();
+                descr_eng = lastEpisodeName.text().substring(lastEpisodeName.text().indexOf("("),
+                        lastEpisodeName.text().length());
+            } else {
+                descr_ru = lastEpisodeName.text().trim();
+                descr_eng = "";
+            }
+            descr_eng = descr_eng.replace("(", "");
+            descr_eng = descr_eng.replace(")", "").trim();
+            mDB.updateSerial(ruName, info[1], descr_ru, descr_eng, status, info[0]);
+            CustomNotification notification = new CustomNotification(mCtx);
+            return notification.newNotification(mCtx, ruName, true);
+        }
+        catch (Exception e)
+        {
+            Log.i("debugBAD",e.getMessage()+" "+link);
+            Log.i("debugBAD",e.getClass().toString()+" ");
+        }
+        return null;
+    }
+
+    public void close()
+    {
+        mDB.close();
     }
 
     public ArrayList<AllSerials> parseReallyAllSerials() {
@@ -80,6 +162,7 @@ public class WebParser {
         ArrayList<AllSerials> result = new ArrayList<>();
         HTTPUrl download = new HTTPUrl();
 
+        if(!isConnected()) return result;
         String parseString = download.getCodeByUrlToString(ALL);
         if (parseString != null) {
             String source = parseString.toString();
@@ -113,11 +196,12 @@ public class WebParser {
         return result;
     }
 
-    public ArrayList<AllSerials> parseAllSerials() {
+    public ArrayList<NotificationDisplay> parseAllSerials() {
 
-        ArrayList<AllSerials> result = new ArrayList<>();
+        ArrayList<NotificationDisplay> result = new ArrayList<>();
+
         HTTPUrl download = new HTTPUrl();
-
+        if(!isConnected()) return result;
         String parseString = download.getCodeByUrlToString(ALL);
         if (parseString != null) {
             String source = parseString.toString();
@@ -131,9 +215,9 @@ public class WebParser {
 
             DB db = new DB(mCtx);
             db.openReadOnly();
-            HashSet<String> ruNames = new HashSet<String>();
+            HashSet<String> ruNames = new HashSet<>();
 
-            Cursor all = db.getAllSerials();
+            Cursor all = db.getReallyAllSerials();
             int ruNameColIndex = all.getColumnIndex(DB.ALL_COLUMN_RU_NAME);
             if (all.moveToFirst()) {
                 do {
@@ -143,15 +227,15 @@ public class WebParser {
                 Log.i("debugWebParser","db is empty");
             }
             db.close();
-
+            CustomNotification notification = new CustomNotification(mCtx);
             while (matcher.find()) {
                 String link = matcher.group(1);
                 String ru = matcher.group(2);
                 String en = matcher.group(3);
                 if (!ruNames.contains(ru) || ruNames.isEmpty()) {
                     try {
-
                         parseAllDetail(new URL(baseURL + link), ru, en);
+                        result.add(notification.newNotification(mCtx, ru, false));
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     }
@@ -168,7 +252,8 @@ public class WebParser {
 
     private void parseAllDetail(URL link, String ru, String eng) {
         try {
-            Document doc = Jsoup.parse(link, 1000);
+            if(!isConnected()) return;
+            Document doc = Jsoup.parse(link, 5000);
             Element element = doc.select("div.mid").first();
 
             Pattern pattern = Pattern.compile
@@ -183,7 +268,9 @@ public class WebParser {
             Element lastEpisode = element.select("span.micro").first();
 
             String[] info = lastEpisode.text().split(",");
+            // info[0] = date, info[1]=episode
 
+            //parse descr ru,eng
             Element lastEpisodeName = element.select("td.t_episode_title").first();
 
             String descr_ru;
@@ -216,4 +303,17 @@ public class WebParser {
         return link;
     }
 
+    private boolean isConnected()
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager)mCtx.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        Log.i("debugSYKAcm",cm.toString());
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if( activeNetwork==null || activeNetwork.isConnectedOrConnecting()==false)
+        {
+            return false;
+        }
+        else
+        return true;
+    }
 }
