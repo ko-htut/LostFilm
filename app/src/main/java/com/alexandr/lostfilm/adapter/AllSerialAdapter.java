@@ -31,12 +31,11 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
 
     private List<AllSerials> listAll;
     private Context mCtx;
-    private int imgSize=234;
 
     public class AllSerialViewHolder extends RecyclerView.ViewHolder {
         public TextView ruName, engName, date,episode;
         public ImageView allImg;
-        private ConstraintLayout layout;
+        private RelativeLayout layout;
         public AllSerialViewHolder(View view) {
             super(view);
             allImg = (ImageView) view.findViewById(R.id.allImg);
@@ -44,7 +43,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
             engName = (TextView) view.findViewById(R.id.allTVnameEng);
             episode = (TextView) view.findViewById(R.id.allEpisode);
             //date = (TextView) view.findViewById(R.id.allDate);
-            layout= (ConstraintLayout) view.findViewById(R.id.item_all_relativelayout);
+            layout= (RelativeLayout) view.findViewById(R.id.item_all_relativelayout);
         }
     }
 
@@ -75,7 +74,6 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
 
         Glide.with(mCtx)
                 .load(serial.getImg_small())
-                .override(imgSize, imgSize) // resize
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -95,7 +93,6 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
                         db.close();
                         Glide.with(mCtx)
                                 .load(serial.getImg_small())
-                                //.override(imgSize, imgSize) // resize
                                 .into(holder.allImg);
                         return false;
                     }

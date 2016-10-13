@@ -56,7 +56,8 @@ public class WebParser {
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            Log.i("DEBUG_TASK_ALL","pzdc "+e.getMessage());
+           return;
         }
 
         Element element = doc.select("div.mid").first();
@@ -108,7 +109,8 @@ public class WebParser {
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            Log.i("DEBUG_TASK_FAV","pzdc "+e.getMessage());
+            return null;
         }
         try {
             Element element = doc.select("div.mid").first();
@@ -293,7 +295,8 @@ public class WebParser {
             Log.i("debug_webparser",pic_link);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.i("DEBUG_TASK_ALL","pzdc "+e.getMessage());
+            return;
         }
     }
 
