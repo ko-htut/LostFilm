@@ -1,6 +1,7 @@
 package com.alexandr.lostfilm.adapter;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,7 +36,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
     public class AllSerialViewHolder extends RecyclerView.ViewHolder {
         public TextView ruName, engName, date,episode;
         public ImageView allImg;
-        private RelativeLayout layout;
+        private ConstraintLayout layout;
         public AllSerialViewHolder(View view) {
             super(view);
             allImg = (ImageView) view.findViewById(R.id.allImg);
@@ -43,7 +44,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
             engName = (TextView) view.findViewById(R.id.allTVnameEng);
             episode = (TextView) view.findViewById(R.id.allEpisode);
             //date = (TextView) view.findViewById(R.id.allDate);
-            layout= (RelativeLayout) view.findViewById(R.id.item_all_relativelayout);
+            layout= (ConstraintLayout) view.findViewById(R.id.item_all_relativelayout);
         }
     }
 
@@ -94,7 +95,7 @@ public class AllSerialAdapter extends RecyclerView.Adapter<AllSerialAdapter.AllS
                         db.close();
                         Glide.with(mCtx)
                                 .load(serial.getImg_small())
-                                .override(imgSize, imgSize) // resize
+                                //.override(imgSize, imgSize) // resize
                                 .into(holder.allImg);
                         return false;
                     }

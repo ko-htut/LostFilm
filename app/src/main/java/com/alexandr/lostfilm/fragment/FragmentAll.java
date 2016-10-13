@@ -4,6 +4,7 @@ package com.alexandr.lostfilm.fragment;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -16,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alexandr.lostfilm.adapter.AllSerialAdapter;
@@ -89,7 +92,15 @@ public class FragmentAll extends Fragment implements SwipeRefreshLayout.OnRefres
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
+                //View v =recyclerView.findViewHolderForAdapterPosition(position).itemView;
+                //RecyclerView.ViewHolder holder =
+                      //  recyclerView.findViewHolderForItemId(mAdapter.getItemId(position));
+              //  RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(position);
+              //  TextView tv = (TextView)holder.itemView.findViewById(R.id.allTVnameEng);
+             //   ConstraintLayout cl=(ConstraintLayout) holder.itemView.findViewById(R.id.item_all_relativelayout);
+               // String show ="size: " +tv.getWidth()+"x"+tv.getHeight();
 
+                //Toast.makeText(getContext().getApplicationContext(),show,Toast.LENGTH_LONG).show();
             }
 
             @Override

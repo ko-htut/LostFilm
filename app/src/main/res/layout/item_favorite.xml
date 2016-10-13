@@ -22,7 +22,9 @@
         android:layout_toRightOf="@id/favImg"
         android:text="Викинги"
         android:textSize="20sp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1" />
 
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
@@ -33,7 +35,9 @@
         android:layout_weight="1"
         android:layout_below="@+id/favTVnameRu"
         android:layout_toRightOf="@+id/favImg"
-        android:layout_toEndOf="@+id/favImg" />
+        android:layout_toEndOf="@+id/favImg"
+        android:maxLines="1"
+        android:ellipsize="end" />
 
     <TextView android:layout_height="wrap_content"
         android:layout_width="wrap_content"
