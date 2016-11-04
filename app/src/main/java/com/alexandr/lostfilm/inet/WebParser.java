@@ -56,7 +56,7 @@ public class WebParser {
         }
         catch (IOException e)
         {
-            Log.i("DEBUG_TASK_ALL","pzdc "+e.getMessage());
+            Log.i("DEBUG_TASK_ALL","msg "+e.getMessage());
            return;
         }
 
@@ -295,7 +295,7 @@ public class WebParser {
             Log.i("debug_webparser",pic_link);
 
         } catch (IOException e) {
-            Log.i("DEBUG_TASK_ALL","pzdc "+e.getMessage());
+            Log.i("DEBUG_TASK_ALL","msg "+e.getMessage());
             return;
         }
     }
@@ -310,7 +310,7 @@ public class WebParser {
     {
         ConnectivityManager cm =
                 (ConnectivityManager)mCtx.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        Log.i("debugSYKAcm",cm.toString());
+        Log.i("debugCm",cm.toString());
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if( activeNetwork==null || activeNetwork.isConnectedOrConnecting()==false)
         {

@@ -33,6 +33,7 @@ public class CheckNewSerialsTask extends AsyncTask<Context,Void,Void> {
                     .load( nd.getImg() )
                     .asBitmap()
                     .into( nd.getTarget() );
+
             mNotificationManager.notify(nd.getId(),nd.getNotif());
         }
     }

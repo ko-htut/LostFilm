@@ -2,7 +2,9 @@ package com.alexandr.lostfilm.notification;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import com.alexandr.lostfilm.MainActivity;
 import com.alexandr.lostfilm.database.DB;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.NotificationTarget;
@@ -64,13 +67,19 @@ public class CustomNotification {
                 rv.setImageViewUri(R.id.remoteview_notification_icon, Uri.parse(serial.getString(colImg)));
                 rv.setTextViewText(R.id.remoteview_notification_headline, serial.getString(colRuName));
                 rv.setTextViewText(R.id.remoteview_notification_short_message, "New Serial: "+serial.getString(colRuName));
+
+                Intent intent = new Intent(mCtx, MainActivity.class);
+                final PendingIntent pendingIntent = PendingIntent.getActivity(mCtx.getApplicationContext(), 0, intent, 0);
+
                 mBuilder =
                         new NotificationCompat.Builder(mCtx)
                                 .setContentTitle("New serial!")
                                 .setContentText(serial.getString(colRuName))
                                 .setContent(rv)
                                 .setSmallIcon(R.drawable.lostfilm_favico_png)
-                                .setSound(alarmSound);
+                                .setSound(alarmSound)
+                                .setContentIntent(pendingIntent);
+
                 nf=mBuilder.build();
             }
 

@@ -82,7 +82,9 @@ public class FavSerialUpdateTask extends AsyncTask<Context,Void,Void> {
                     notifList.add(toAdd);
                 }
             } while (c.moveToNext());
+            c.close();
             webParser.close();
+            db.close();
         }
         return null;
     }
